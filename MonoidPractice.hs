@@ -35,3 +35,13 @@ cartCombine func l1 l2 = zipWith func newL1 cycledL2
       repeatedL1 = map (take nToAdd . repeat) l1
       newL1 = mconcat repeatedL1
       cycledL2 = cycle l2 
+
+-- with this code segment you now made PTable an instance of semigroup --
+
+combineEvents :: Events -> Events -> Events
+combineEvents e1 e2 = cartCombine combiner e1 e2
+  where
+      combiner = (\x y->mconcat [x,"-",y])
+
+combinedProbs :: Probs -> Probs -> Probs
+combinedProbs p1 p2 = cartCombine (*) p1 p2

@@ -36,12 +36,40 @@ cartCombine func l1 l2 = zipWith func newL1 cycledL2
       newL1 = mconcat repeatedL1
       cycledL2 = cycle l2 
 
--- with this code segment you now made PTable an instance of semigroup --
+-- combine events and probs --
 
 combineEvents :: Events -> Events -> Events
 combineEvents e1 e2 = cartCombine combiner e1 e2
   where
       combiner = (\x y->mconcat [x,"-",y])
 
-combinedProbs :: Probs -> Probs -> Probs
-combinedProbs p1 p2 = cartCombine (*) p1 p2
+combineProbs :: Probs -> Probs -> Probs
+combineProbs p1 p2 = cartCombine (*) p1 p2
+
+-- with this code segment you now made PTable an instance of semigroup --
+
+instance Semigroup PTable where
+    (<>) ptable1 (PTable [] []) = ptable1
+    (<>) (PTable [] []) ptable2 = ptable2
+    (<>) (PTable e1 p1) (PTable e2 p2) = createPTable newEvents newProbs
+      where
+          newEvents = combineEvents e1 e2
+          newProbs = combineProbs p1 p2
+
+-- Make PTable an  instance of monoid --
+-- this gives you the utility of mconcat for free --
+
+instance Monoid PTable where
+    mempty = PTable [] []
+    mappend = (<>)
+
+-- Create a function for coin flip and spin spinner --
+
+coin :: PTable
+coin = createPTable ["heads","tails"] [0.5,0.5]
+
+spinner :: PTable
+spinner = createPTable ["red","blue","green"] [0.1,0.2,0.7]
+
+-- To find out the probability of a certain outcome --
+-- GHCI> coin <> spinner

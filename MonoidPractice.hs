@@ -73,3 +73,5 @@ spinner = createPTable ["red","blue","green"] [0.1,0.2,0.7]
 
 -- To find out the probability of a certain outcome --
 -- GHCI> coin <> spinner
+-- Or probability of flipping the same result three times in a row --
+-- GHCI> mconcat [coin,coin,coin]
